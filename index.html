@@ -3,17 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2026 沖繩旅遊小秘書 (V26)</title>
+    <title>2026 沖繩旅遊小秘書 (Fixed)</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-
-    <!-- Firebase Compat SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
     <style>
         .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
@@ -33,7 +29,7 @@
     <div id="loading-screen">
         <div class="animate-spin text-emerald-500 mb-4"><i data-lucide="loader-2" width="48" height="48"></i></div>
         <div class="text-slate-400 text-sm" id="loading-text">系統啟動中...</div>
-        <button onclick="forceStart()" id="force-btn" class="mt-6 text-xs text-slate-500 border border-slate-700 px-3 py-1 rounded hover:text-white hidden">強制進入</button>
+        <div class="text-[10px] text-slate-600 mt-2">Connecting to Secure Cloud</div>
     </div>
 
     <!-- Header -->
@@ -52,15 +48,15 @@
                     </div>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="app.exportCSV()" class="p-2 rounded-full bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white transition-all hidden" id="btn-export"><i data-lucide="download" width="18"></i></button>
-                    <button onclick="app.toggleConverter()" class="p-2 rounded-full bg-slate-800 text-slate-400 hover:bg-slate-700 transition-all"><i data-lucide="calculator" width="18"></i></button>
+                    <button onclick="window.app.exportCSV()" class="p-2 rounded-full bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white transition-all hidden" id="btn-export"><i data-lucide="download" width="18"></i></button>
+                    <button onclick="window.app.toggleConverter()" class="p-2 rounded-full bg-slate-800 text-slate-400 hover:bg-slate-700 transition-all"><i data-lucide="calculator" width="18"></i></button>
                 </div>
             </div>
             <div id="converter-panel" class="hidden bg-slate-800/80 rounded-lg p-3 border border-slate-600 mt-2 fade-in">
                 <div class="flex items-center gap-2">
-                    <div class="relative flex-1"><span class="absolute left-2 top-2 text-xs text-slate-400">🇯🇵 JPY</span><input type="number" id="conv-jpy" oninput="app.convertCurrency('jpy')" class="w-full bg-slate-900 border border-slate-600 rounded p-1.5 pt-6 text-white text-right focus:outline-none focus:border-indigo-500"></div>
+                    <div class="relative flex-1"><span class="absolute left-2 top-2 text-xs text-slate-400">🇯🇵 JPY</span><input type="number" id="conv-jpy" oninput="window.app.convertCurrency('jpy')" class="w-full bg-slate-900 border border-slate-600 rounded p-1.5 pt-6 text-white text-right focus:outline-none focus:border-indigo-500"></div>
                     <i data-lucide="arrow-right-left" class="text-slate-500" width="16"></i>
-                    <div class="relative flex-1"><span class="absolute left-2 top-2 text-xs text-slate-400">🇹🇼 TWD</span><input type="number" id="conv-twd" oninput="app.convertCurrency('twd')" class="w-full bg-slate-900 border border-slate-600 rounded p-1.5 pt-6 text-white text-right focus:outline-none focus:border-emerald-500"></div>
+                    <div class="relative flex-1"><span class="absolute left-2 top-2 text-xs text-slate-400">🇹🇼 TWD</span><input type="number" id="conv-twd" oninput="window.app.convertCurrency('twd')" class="w-full bg-slate-900 border border-slate-600 rounded p-1.5 pt-6 text-white text-right focus:outline-none focus:border-emerald-500"></div>
                 </div>
             </div>
         </div>
@@ -72,39 +68,60 @@
     <!-- Footer -->
     <div class="fixed bottom-0 left-0 right-0 bg-[#1e293b]/95 backdrop-blur-md border-t border-slate-700 pb-safe z-40">
         <div class="flex justify-around max-w-3xl mx-auto">
-            <button onclick="app.switchTab('itinerary')" id="tab-itinerary" class="flex-1 py-4 flex flex-col items-center gap-1 text-[10px] font-medium transition-colors text-indigo-400"><i data-lucide="calendar" width="24"></i> 行程</button>
+            <button onclick="window.app.switchTab('itinerary')" id="tab-itinerary" class="flex-1 py-4 flex flex-col items-center gap-1 text-[10px] font-medium transition-colors text-indigo-400"><i data-lucide="calendar" width="24"></i> 行程</button>
             <div class="w-px bg-slate-700 my-3 opacity-50"></div>
-            <button onclick="app.switchTab('backup')" id="tab-backup" class="flex-1 py-4 flex flex-col items-center gap-1 text-[10px] font-medium transition-colors text-slate-500"><i data-lucide="folder-plus" width="24"></i> 備案</button>
+            <button onclick="window.app.switchTab('backup')" id="tab-backup" class="flex-1 py-4 flex flex-col items-center gap-1 text-[10px] font-medium transition-colors text-slate-500"><i data-lucide="folder-plus" width="24"></i> 備案</button>
             <div class="w-px bg-slate-700 my-3 opacity-50"></div>
-            <button onclick="app.switchTab('recommend')" id="tab-recommend" class="flex-1 py-4 flex flex-col items-center gap-1 text-[10px] font-medium transition-colors text-slate-500"><i data-lucide="thumbs-up" width="24"></i> 推薦</button>
+            <button onclick="window.app.switchTab('recommend')" id="tab-recommend" class="flex-1 py-4 flex flex-col items-center gap-1 text-[10px] font-medium transition-colors text-slate-500"><i data-lucide="thumbs-up" width="24"></i> 推薦</button>
             <div class="w-px bg-slate-700 my-3 opacity-50"></div>
-            <button onclick="app.switchTab('split')" id="tab-split" class="flex-1 py-4 flex flex-col items-center gap-1 text-[10px] font-medium transition-colors text-slate-500"><i data-lucide="divide-square" width="24"></i> 分帳</button>
+            <button onclick="window.app.switchTab('split')" id="tab-split" class="flex-1 py-4 flex flex-col items-center gap-1 text-[10px] font-medium transition-colors text-slate-500"><i data-lucide="divide-square" width="24"></i> 分帳</button>
             <div class="w-px bg-slate-700 my-3 opacity-50"></div>
-            <button onclick="app.switchTab('accounting')" id="tab-accounting" class="flex-1 py-4 flex flex-col items-center gap-1 text-[10px] font-medium transition-colors text-slate-500"><i data-lucide="wifi" width="24"></i> 記帳</button>
+            <button onclick="window.app.switchTab('accounting')" id="tab-accounting" class="flex-1 py-4 flex flex-col items-center gap-1 text-[10px] font-medium transition-colors text-slate-500"><i data-lucide="wifi" width="24"></i> 記帳</button>
         </div>
     </div>
 
-    <script>
-        // ==========================================
-        // 安全啟動機制
-        // ==========================================
-        window.forceStart = function() {
-            const l = document.getElementById('loading-screen');
-            if(l) { l.style.opacity='0'; setTimeout(()=>l.style.display='none',500); }
-            app.renderAll();
-        };
-        setTimeout(() => {
-            const btn = document.getElementById('force-btn');
-            if(btn) btn.classList.remove('hidden');
-            // 自動嘗試移除
-            if(window.app && window.app.state) window.forceStart();
-        }, 3000);
+    <!-- Firebase Module Logic -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+        import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, query, orderBy, setDoc, writeBatch } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
-        // ==========================================
-        // 應用程式核心 (Namespace: app)
-        // ==========================================
-        window.app = {
+        // --- Config & Init ---
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'okinawa-v26';
+        
+        // 如果環境變數不存在 (本地測試用)，提供 fallback
+        if (!firebaseConfig.apiKey) {
+           console.warn("No Firebase Config found. App may not work.");
+        }
+
+        const fbApp = initializeApp(firebaseConfig);
+        const auth = getAuth(fbApp);
+        const db = getFirestore(fbApp);
+
+        // Define Collection Refs (Use Functions to ensure late binding if needed, but here const is fine)
+        // 使用 artifacts/public/data 路徑以確保權限正確
+        const getColl = (name) => collection(db, 'artifacts', appId, 'public', 'data', name);
+
+        // --- Data Constants ---
+        const EXPENSE_CATEGORIES=[{id:'food',name:'餐飲',icon:'utensils',color:'bg-orange-500'},{id:'transport',name:'交通',icon:'bus',color:'bg-blue-500'},{id:'shopping',name:'購物',icon:'shopping-bag',color:'bg-pink-500'},{id:'ticket',name:'門票',icon:'ticket',color:'bg-purple-500'},{id:'hotel',name:'住宿',icon:'home',color:'bg-indigo-500'},{id:'other',name:'其他',icon:'more-horizontal',color:'bg-gray-500'}];
+        const DAYS_STRUCTURE=[{date:"Day 1 (5/25)",title:"虎航早班機 & 美國村",icon:"plane"},{date:"Day 2 (5/26)",title:"藍洞浮潛 & 頂級燒肉",icon:"sun"},{date:"Day 3 (5/27)",title:"北部風光 & 居酒屋",icon:"map-pin"},{date:"Day 4 (5/28)",title:"購物日 & 唐吉訶德",icon:"shopping-bag"},{date:"Day 5 (5/29)",title:"南部悠閒 & 牛排宵夜",icon:"coffee"},{date:"Day 6 (5/30)",title:"Outlet & 機場免稅",icon:"plane"}];
+        const DEFAULT_USERS=[{id:'u1',name:'旅客 A',color:'bg-blue-500',text:'text-blue-400',border:'border-blue-500'},{id:'u2',name:'旅客 B',color:'bg-pink-500',text:'text-pink-400',border:'border-pink-500'},{id:'u3',name:'旅客 C',color:'bg-amber-500',text:'text-amber-400',border:'border-amber-500'},{id:'u4',name:'旅客 D',color:'bg-emerald-500',text:'text-emerald-400',border:'border-emerald-500'}];
+        const REC_SPOTS=[{title:"美麗海水族館",tag:"北部"},{title:"古宇利島",tag:"北部"},{title:"美國村",tag:"中部"},{title:"萬座毛",tag:"中部"},{title:"國際通",tag:"南部"},{title:"瀨長島",tag:"南部"},{title:"暖暮拉麵",tag:"美食"},{title:"燒肉敘敘苑",tag:"美食"},{title:"Parco City",tag:"購物"},{title:"唐吉訶德",tag:"購物"}];
+
+        const DEFAULT_ITINERARY_EVENTS_SOURCE = [
+            {dayIndex:0, events:[{time:"09:20",title:"抵達那霸機場 & 取車",note:"預計出關+取車約1.5小時",cost:"租車費",imgKey:"airport"},{time:"11:30",title:"糸滿魚市場",note:"海鮮生魚片",cost:"¥2000",imgKey:"market"},{time:"15:30",title:"Snoopy Surf Shop",note:"美國村",cost:"",imgKey:"american-village"},{time:"20:00",title:"美國村夜景",note:"日落步道",cost:"",imgKey:"night-view"}]},
+            {dayIndex:1, events:[{time:"08:00",title:"青之洞窟浮潛",note:"真榮田岬",cost:"¥4000",imgKey:"snorkeling"},{time:"11:30",title:"Pizzeria da ENZO",note:"窯烤披薩",cost:"¥2000",imgKey:"pizza"},{time:"19:00",title:"琉球之牛",note:"頂級燒肉",cost:"¥8000",imgKey:"beef"}]},
+            {dayIndex:2, events:[{time:"11:00",title:"古宇利大橋",note:"心形岩",cost:"",imgKey:"bridge"},{time:"14:00",title:"美麗海水族館",note:"黑潮之海",cost:"¥2180",imgKey:"aquarium"},{time:"19:00",title:"阿古豬涮涮鍋",note:"恩納豚",cost:"¥4000",imgKey:"food-taco"}]},
+            {dayIndex:3, events:[{time:"11:00",title:"PARCO CITY",note:"最大百貨",cost:"",imgKey:"parco"},{time:"20:30",title:"唐吉訶德",note:"國際通24H",cost:"",imgKey:"donki"}]},
+            {dayIndex:4, events:[{time:"09:30",title:"波上宮",note:"海邊神社",cost:"¥800",imgKey:"shrine"},{time:"14:00",title:"壺屋通",note:"文青下午茶",cost:"¥1000",imgKey:"coffee"},{time:"22:00",title:"傑克牛排",note:"美式復古",cost:"¥2500",imgKey:"beef"}]},
+            {dayIndex:5, events:[{time:"11:00",title:"Ashibinaa Outlet",note:"最後購物",cost:"",imgKey:"outlet"},{time:"15:00",title:"iias 豐崎",note:"DMM水族館",cost:"",imgKey:"parco"},{time:"19:40",title:"那霸機場",note:"返台",cost:"",imgKey:"airport"}]}
+        ];
+
+        // --- Application State & Logic ---
+        const app = {
             state: {
+                user: null, // Auth user
                 activeTab: 'itinerary',
                 itineraryEvents: [],
                 backupEvents: [],
@@ -114,47 +131,48 @@
                 expandedId: null,
                 expandedExpId: null,
                 selectedUser: 'u1',
-                isAddingItinerary: null,
-                isAddingBackup: false,
-                recommendFilter: '全部',
-                formAmount: '', formNote: '', // 記帳暫存
-                splitAmount: '', splitPayer: 'u1', splitTargets: [], splitCurrency: 'JPY' // 分帳暫存
+                formAmount: '', formNote: '',
+                splitAmount: '', splitPayer: 'u1', splitTargets: [], splitCurrency: 'JPY'
             },
             tempExpCat: 'food',
-            tempExpCurr: 'JPY', // 記帳頁面幣別
+            tempExpCurr: 'JPY',
+            listeners: [],
 
-            // Firebase Config
-            firebaseConfig: {
-              apiKey: "AIzaSyBvclnyKUkCUzyBnGljSMsg38DfgroRDxg",
-              authDomain: "okinawaonline-64b20.firebaseapp.com",
-              projectId: "okinawaonline-64b20",
-              storageBucket: "okinawaonline-64b20.firebasestorage.app",
-              messagingSenderId: "457339726484",
-              appId: "1:457339726484:web:686abfc9820d6d9c4b2281",
-              measurementId: "G-7XV7V6QXBV"
-            },
-
-            // 初始化
-            init: function() {
-                try {
-                    if(typeof firebase !== 'undefined') {
-                        firebase.initializeApp(this.firebaseConfig);
-                        window.db = firebase.firestore();
-                        window.usersRef = db.collection("config").doc("users");
-                        window.expensesRef = db.collection("expenses");
-                        window.itineraryRef = db.collection("itinerary_events");
-                        window.backupRef = db.collection("backup_events");
-                        this.initListeners();
+            init: async function() {
+                // Auth Flow
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        this.state.user = user;
+                        this.initDataListeners();
+                        // Hide loading
+                        const l = document.getElementById('loading-screen');
+                        if(l) { l.style.opacity='0'; setTimeout(()=>l.style.display='none',500); }
+                    } else {
+                        // Retry or Show Error
+                        console.log("No user, waiting for sign in...");
                     }
-                } catch(e) { console.error(e); }
+                });
+                
+                // Sign In
+                try {
+                    await signInAnonymously(auth);
+                } catch(e) {
+                    console.error("Auth failed:", e);
+                    document.getElementById('loading-text').innerText = "連線失敗: " + e.message;
+                }
 
+                // Initial Fetch (Weather, Rate)
                 fetch('https://api.exchangerate-api.com/v4/latest/TWD').then(r=>r.json()).then(d=>{if(d?.rates?.JPY) this.state.rate=d.rates.JPY; this.renderHeader();}).catch(()=>{});
                 this.fetchWeather();
-                this.renderAll();
+                this.renderAll(); // Render initial skeleton
             },
 
-            initListeners: function() {
-                const us = (ok) => {
+            initDataListeners: function() {
+                // Clear old listeners
+                this.listeners.forEach(unsub => unsub());
+                this.listeners = [];
+
+                const updateStatus = (ok) => {
                     const el = document.getElementById('cloud-status');
                     if(el) {
                         el.innerHTML = ok ? `<div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div> 雲端已連線` : `<div class="w-2 h-2 rounded-full bg-red-500"></div> 連線中斷`;
@@ -162,33 +180,44 @@
                     }
                 };
 
-                // 關鍵：資料更新時，只更新數據，不強制重繪「正在輸入」的頁面
-                expensesRef.orderBy("timestamp", "desc").onSnapshot(s => { 
-                    let l=[]; s.forEach(d=>l.push({id:d.id,...d.data()})); 
-                    this.state.expenses=l; 
+                // Expenses
+                const expQ = query(getColl("expenses"), orderBy("timestamp", "desc"));
+                this.listeners.push(onSnapshot(expQ, (s) => {
+                    let l=[]; s.forEach(d=>l.push({id:d.id,...d.data()}));
+                    this.state.expenses=l;
                     if(this.state.activeTab === 'accounting' && document.activeElement.tagName !== 'INPUT') this.renderContent();
-                    us(true); 
-                }, ()=>us(false));
+                    updateStatus(true);
+                }, (e) => { console.error(e); updateStatus(false); }));
 
-                itineraryRef.onSnapshot(s => { 
-                    let l=[]; s.forEach(d=>l.push({id:d.id,...d.data()})); 
-                    this.state.itineraryEvents=l; 
+                // Itinerary
+                this.listeners.push(onSnapshot(getColl("itinerary_events"), (s) => {
+                    let l=[]; s.forEach(d=>l.push({id:d.id,...d.data()}));
+                    this.state.itineraryEvents=l;
                     if(this.state.activeTab === 'itinerary') this.renderContent();
-                });
+                }, (e) => console.error(e)));
 
-                backupRef.orderBy("timestamp", "desc").onSnapshot(s => { 
-                    let l=[]; s.forEach(d=>l.push({id:d.id,...d.data()})); 
-                    this.state.backupEvents=l; 
+                // Backup
+                const bkQ = query(getColl("backup_events"), orderBy("timestamp", "desc"));
+                this.listeners.push(onSnapshot(bkQ, (s) => {
+                    let l=[]; s.forEach(d=>l.push({id:d.id,...d.data()}));
+                    this.state.backupEvents=l;
                     if(this.state.activeTab === 'backup') this.renderContent();
-                });
+                }, (e) => console.error(e)));
 
-                usersRef.onSnapshot(s => { 
-                    if(s.exists) {
-                        this.state.users=s.data().list;
+                // Users (Config)
+                // Note: Users is likely a single document or a collection. The original code treated it as a doc in a collection called config.
+                // We will use a collection "users" for simplicity, or a doc "config_users". Let's use a document in a "settings" collection to match original intent of a single list.
+                const usersDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'user_list');
+                this.listeners.push(onSnapshot(usersDocRef, (s) => {
+                    if(s.exists()) {
+                        this.state.users = s.data().list;
                         if(this.state.splitTargets.length===0) this.state.splitTargets = this.state.users.map(u=>u.id);
-                    } else usersRef.set({list:DEFAULT_USERS});
+                    } else {
+                        // Init Default Users
+                        setDoc(usersDocRef, {list: DEFAULT_USERS});
+                    }
                     if(this.state.activeTab === 'accounting' || this.state.activeTab === 'split') this.renderContent();
-                });
+                }, (e) => console.error(e)));
             },
 
             fetchWeather: async function() {
@@ -206,7 +235,7 @@
                 }catch(e){}
             },
 
-            // 核心渲染
+            // --- Render Logic (Keep mostly same, just updating calls) ---
             renderAll: function() { this.renderHeader(); this.renderContent(); this.renderBottomNav(); if(window.lucide) lucide.createIcons(); },
             
             renderHeader: function() {
@@ -219,9 +248,9 @@
                     'accounting': {t:'雲端記帳', i:'wifi', c:'text-emerald-400'}
                 };
                 const curr = titleMap[t];
-                document.getElementById('app-title').innerHTML = `<i data-lucide="${curr.i}" class="${curr.c}" width="20"></i> ${curr.t}`;
+                const el = document.getElementById('app-title');
+                if(el) el.innerHTML = `<i data-lucide="${curr.i}" class="${curr.c}" width="20"></i> ${curr.t}`;
                 
-                // Export btn logic
                 const eb = document.getElementById('btn-export');
                 if(eb) eb.classList.toggle('hidden', t !== 'accounting');
             },
@@ -240,30 +269,115 @@
                 if(!c) return;
                 c.innerHTML = '';
                 const t = this.state.activeTab;
-                if(t === 'itinerary') renderItinerary(c);
-                else if(t === 'backup') renderBackup(c);
-                else if(t === 'recommend') renderRecommend(c);
-                else if(t === 'split') renderSplit(c);
-                else renderAccounting(c);
+                if(t === 'itinerary') this.renderItinerary(c);
+                else if(t === 'backup') this.renderBackup(c);
+                else if(t === 'recommend') this.renderRecommend(c);
+                else if(t === 'split') this.renderSplit(c);
+                else this.renderAccounting(c);
                 if(window.lucide) lucide.createIcons();
             },
 
-            // Actions
+            // --- Sub Renderers ---
+            renderItinerary: function(c) {
+                if(this.state.itineraryEvents.length===0) {
+                    c.innerHTML=`<div class="bg-slate-800 p-6 rounded-xl text-center border border-slate-700 mt-8"><i data-lucide="cloud-off" class="mx-auto text-slate-500 mb-2" width="48"></i><div class="text-white font-bold mb-2">行程是空的</div><button onclick="window.app.uploadDefaultItinerary()" class="bg-indigo-600 text-white px-4 py-2 rounded">上傳預設行程</button></div>`;
+                    return;
+                }
+                DAYS_STRUCTURE.forEach((d,i)=>{
+                    const evs = this.state.itineraryEvents.filter(e=>e.dayIndex===i).sort((a,b)=>a.time.localeCompare(b.time));
+                    let h = evs.map(e=>`<div class="flex items-center gap-3 p-3 border-b border-slate-700/50 hover:bg-slate-700/30"><div class="w-12 text-right text-sm font-mono text-indigo-400 font-bold">${e.time}</div><div class="flex-1"><div class="text-sm font-bold text-slate-200">${e.title}</div><div class="text-xs text-slate-500">${e.note}</div></div><button onclick="window.app.deleteCloudItin('${e.id}')" class="text-slate-600 hover:text-red-400"><i data-lucide="trash-2" width="14"></i></button></div>`).join('');
+                    const card = document.createElement('div');
+                    card.className = "bg-[#1e293b] rounded-xl border border-slate-700/60 overflow-hidden mb-4";
+                    card.innerHTML = `<div class="bg-slate-800 px-4 py-2 border-b border-slate-700 flex justify-between items-center"><span class="font-bold text-indigo-100">${d.date}</span><button onclick="window.app.showAddItinModal(${i})" class="text-indigo-400"><i data-lucide="plus-circle" width="18"></i></button></div><div>${h||'<div class="p-3 text-center text-xs text-slate-500">無行程</div>'}</div>`;
+                    c.appendChild(card);
+                });
+            },
+
+            renderBackup: function(c) {
+                const lst = this.state.backupEvents.map(e=>`<div class="p-3 bg-slate-800 rounded mb-2 border border-slate-700 flex justify-between items-center"><div><div class="font-bold text-sm text-slate-200">${e.title}</div><div class="text-xs text-slate-500">${e.note}</div></div><button onclick="window.app.deleteCloudBackup('${e.id}')" class="text-slate-600 hover:text-red-400"><i data-lucide="trash-2" width="14"></i></button></div>`).join('');
+                c.innerHTML = `<div class="mb-4 flex gap-2"><input id="bk-title" placeholder="景點" class="bg-slate-800 border border-slate-600 rounded p-2 text-sm w-1/2"><input id="bk-note" placeholder="備註" class="bg-slate-800 border border-slate-600 rounded p-2 text-sm w-1/2"><button onclick="window.app.submitBackup()" class="bg-pink-600 text-white px-3 rounded"><i data-lucide="plus" width="16"></i></button></div><div>${lst||'<div class="text-center text-slate-500 text-sm">無備案</div>'}</div>`;
+            },
+
+            renderRecommend: function(c) {
+                const h = REC_SPOTS.map(s=>`<div class="bg-slate-800 rounded p-3 border border-slate-700 flex justify-between items-center"><div><div class="font-bold text-sm text-slate-200">${s.title}</div><div class="text-xs text-blue-400 bg-blue-900/30 px-1.5 py-0.5 rounded inline-block mt-1">${s.tag}</div></div><button onclick="window.app.addCloudBackup({title:'${s.title}',tag:'${s.tag}',note:'推薦'});alert('已加入')" class="bg-slate-700 hover:bg-blue-600 text-white p-1.5 rounded"><i data-lucide="plus" width="14"></i></button></div>`).join('');
+                c.innerHTML = `<div class="grid grid-cols-2 gap-3">${h}</div>`;
+            },
+
+            renderSplit: function(c) {
+                const u = this.state.users;
+                if(!u || u.length === 0) { c.innerHTML = '<div class="text-center text-slate-500 p-5">載入使用者中...</div>'; return; }
+
+                const isTwd = this.state.splitCurrency === 'TWD';
+                
+                c.innerHTML = `
+                    <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
+                        <div class="flex gap-2 mb-4">
+                            <input type="number" id="split-input" value="${this.state.splitAmount}" oninput="window.app.updateSplitCalc(this.value)" class="w-2/3 bg-slate-900 border border-slate-600 rounded p-3 text-xl text-center text-white outline-none focus:border-amber-500" placeholder="總金額">
+                            <div class="w-1/3 flex bg-slate-900 rounded border border-slate-600 p-1">
+                                <button onclick="window.app.setSplitCurrency('JPY')" class="flex-1 rounded text-xs ${!isTwd?'bg-amber-600 text-white':'text-slate-400'}">日幣</button>
+                                <button onclick="window.app.setSplitCurrency('TWD')" class="flex-1 rounded text-xs ${isTwd?'bg-indigo-600 text-white':'text-slate-400'}">台幣</button>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <div>
+                                <div class="text-xs text-slate-400 mb-1">付款人</div>
+                                <div class="flex gap-2 overflow-x-auto pb-1">${u.map(x=>`<button onclick="window.app.setSplitPayer('${x.id}')" class="px-3 py-2 rounded text-xs whitespace-nowrap transition-colors ${this.state.splitPayer===x.id?`${x.color} text-white`:'bg-slate-700 text-slate-400'}">${x.name}</button>`).join('')}</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-slate-400 mb-1">分攤對象</div>
+                                <div class="grid grid-cols-2 gap-2">${u.map(x=>{const sel=this.state.splitTargets.includes(x.id); return `<button onclick="window.app.toggleSplitTarget('${x.id}')" class="py-2 rounded text-xs border ${sel?'bg-slate-600 text-white border-amber-500':'bg-slate-700 text-slate-500 border-transparent'}">${x.name} ${sel?'✓':''}</button>`}).join('')}</div>
+                            </div>
+                        </div>
+                        <div id="split-result" class="mt-4"></div>
+                    </div>
+                `;
+                // Trigger calc
+                this.updateSplitCalc(this.state.splitAmount);
+            },
+
+            renderAccounting: function(c) {
+                const total = this.state.expenses.reduce((s,i)=>s+i.amount,0);
+                const twd = Math.round(total/this.state.rate);
+                
+                const usersHtml = (this.state.users||DEFAULT_USERS).map(u=>`<div class="flex flex-col items-center"><div class="w-8 h-8 rounded-full ${u.color} flex items-center justify-center text-white font-bold text-xs shadow">${u.name[0]}</div><div class="text-[10px] mt-1 text-slate-400">${u.name}</div></div>`).join('');
+                
+                const isJpy = this.tempExpCurr==='JPY';
+                const cats = EXPENSE_CATEGORIES.map(x=>`<button onclick="window.app.setExpCat('${x.id}')" class="flex flex-col items-center gap-1 p-2 rounded ${this.tempExpCat===x.id?'bg-slate-700 ring-1 ring-emerald-500':''}"><div class="${x.color} text-white p-1.5 rounded-full"><i data-lucide="${x.icon}" width="14"></i></div><span class="text-[10px] text-slate-400">${x.name}</span></button>`).join('');
+
+                const list = this.state.expenses.map(e=>{
+                    const u = (this.state.users||DEFAULT_USERS).find(x=>x.id===e.userId)||DEFAULT_USERS[0];
+                    const cat = EXPENSE_CATEGORIES.find(x=>x.id===e.cat)||EXPENSE_CATEGORIES[0];
+                    const isEx = this.state.expandedExpId === e.id;
+                    return `<div onclick="window.app.toggleExpandExpense('${e.id}')" class="bg-slate-800 border-l-4 ${u.border} rounded mb-2 overflow-hidden"><div class="p-3 flex items-center gap-3"><div class="${cat.color} p-2 rounded-full text-white"><i data-lucide="${cat.icon}" width="16"></i></div><div class="flex-1"><div class="flex justify-between"><span class="text-sm font-bold text-slate-200">${e.note||cat.name}</span><span class="font-mono text-white">¥${e.amount}</span></div><div class="text-[10px] text-slate-500 flex justify-between mt-1"><span>${u.name}</span><span>≈ NT$${Math.round(e.amount/this.state.rate)}</span></div></div></div>${isEx?`<div class="bg-slate-900/30 p-2 text-right"><button onclick="event.stopPropagation();window.app.deleteCloudExpense('${e.id}')" class="text-xs text-red-400 flex items-center justify-end gap-1"><i data-lucide="trash-2" width="12"></i> 刪除</button></div>`:''}</div>`;
+                }).join('');
+
+                c.innerHTML = `
+                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 mb-4"><div class="text-center"><div class="text-3xl font-bold text-white">¥${total.toLocaleString()}</div><div class="text-xs text-slate-400">約 NT$ ${twd.toLocaleString()}</div></div><div class="grid grid-cols-4 gap-2 mt-4 border-t border-slate-700 pt-3">${usersHtml}</div></div>
+                    
+                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 mb-4">
+                        <div class="flex gap-2 mb-3">
+                            <div class="w-2/3 relative"><input type="number" id="amt-in" value="${this.state.formAmount}" oninput="window.app.syncAmount(this.value)" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white text-lg outline-none focus:border-emerald-500" placeholder="0"><span class="absolute right-2 top-3 text-xs text-slate-500">${this.tempExpCurr}</span></div>
+                            <div class="w-1/3 flex bg-slate-900 rounded border border-slate-600 p-1"><button onclick="window.app.setExpCurr('JPY')" class="flex-1 text-xs rounded ${isJpy?'bg-emerald-600 text-white':'text-slate-400'}">日</button><button onclick="window.app.setExpCurr('TWD')" class="flex-1 text-xs rounded ${!isJpy?'bg-indigo-600 text-white':'text-slate-400'}">台</button></div>
+                        </div>
+                        <div class="grid grid-cols-6 gap-1 mb-3">${cats}</div>
+                        <div class="flex gap-2"><input id="note-in" value="${this.state.formNote}" oninput="window.app.syncNote(this.value)" placeholder="備註" class="flex-1 bg-slate-900 border border-slate-600 rounded px-3 text-sm text-white outline-none"><button onclick="window.app.submitExpense()" class="bg-emerald-600 text-white p-2.5 rounded shadow"><i data-lucide="plus" width="20"></i></button></div>
+                    </div>
+                    
+                    <div>${list}</div>
+                `;
+            },
+
+            // --- Actions & Handlers ---
             switchTab: function(t) { this.state.activeTab=t; this.renderAll(); },
-            toggleExpand: function(id) { this.state.expandedId = this.state.expandedId===id?null:id; this.renderContent(); },
             toggleExpandExpense: function(id) { this.state.expandedExpId = this.state.expandedExpId===id?null:id; this.renderContent(); },
             toggleConverter: function() { document.getElementById('converter-panel').classList.toggle('hidden'); },
-            
-            // --- INPUT HANDLERS (NO RE-RENDER) ---
             syncAmount: function(v) { this.state.formAmount=v; },
             syncNote: function(v) { this.state.formNote=v; },
-            
-            // 記帳功能
             setExpCat: function(c) { this.tempExpCat=c; this.renderContent(); },
             setExpCurr: function(c) { this.tempExpCurr=c; this.renderContent(); },
-            selectUser: function(id) { this.state.selectedUser=id; this.renderContent(); },
+            
             submitExpense: function(e) {
-                e.preventDefault();
+                if(e) e.preventDefault();
                 const a=this.state.formAmount, n=this.state.formNote;
                 if(!a){alert("請輸入金額");return;}
                 let v=parseFloat(a);
@@ -272,19 +386,17 @@
                 this.state.formAmount=''; this.state.formNote=''; 
                 this.renderContent();
             },
-            deleteCloudExpense: function(id) { if(confirm("刪除?")) window.expensesRef.doc(id).delete(); },
-
-            // 分帳功能 (Fixed)
+            
+            // Split Logic
             updateSplitCalc: function(val) {
                 this.state.splitAmount = val;
-                // 手動更新結果區，不重繪整個表單
                 const d=document.getElementById('split-result');
                 if(d) {
                     const amt=parseFloat(val);
                     if(amt && this.state.splitTargets.length>0) {
                         const pp = Math.round(amt / this.state.splitTargets.length);
                         const sym = this.state.splitCurrency==='TWD'?'NT$':'¥';
-                        d.innerHTML = `<div class="text-center text-3xl font-bold text-amber-400 mb-2">每人 ${sym}${pp.toLocaleString()}</div><button onclick="app.submitSplit(${pp})" class="w-full bg-amber-600 text-white py-2 rounded font-bold">寫入記帳</button>`;
+                        d.innerHTML = `<div class="text-center text-3xl font-bold text-amber-400 mb-2">每人 ${sym}${pp.toLocaleString()}</div><button onclick="window.app.submitSplit(${pp})" class="w-full bg-amber-600 text-white py-2 rounded font-bold">寫入記帳</button>`;
                     } else {
                         d.innerHTML = `<div class="text-center text-slate-500 py-2">輸入金額...</div>`;
                     }
@@ -296,7 +408,6 @@
                 const i=this.state.splitTargets.indexOf(id); 
                 if(i>-1)this.state.splitTargets.splice(i,1); else this.state.splitTargets.push(id); 
                 this.renderContent();
-                // Refocus
                 const inp = document.getElementById('split-input');
                 if(inp) { inp.value=this.state.splitAmount; inp.focus(); }
             },
@@ -313,13 +424,20 @@
                 }
             },
 
+            // Convert Helper
+            convertCurrency: function(t) {
+                const j=document.getElementById('conv-jpy'), tw=document.getElementById('conv-twd');
+                if(t==='jpy') tw.value=j.value?Math.round(j.value/this.state.rate):'';
+                else j.value=tw.value?Math.round(tw.value*this.state.rate):'';
+            },
+
             // CSV Export
             exportCSV: function() {
                 if(this.state.expenses.length===0) {alert("無資料");return;}
                 let c="\uFEFF日期,付款人,項目,日幣,台幣約,備註\n";
                 this.state.expenses.forEach(e=>{
                     const d=new Date(e.timestamp).toLocaleDateString();
-                    const u=this.state.users.find(x=>x.id===e.userId)?.name||'';
+                    const u=(this.state.users||DEFAULT_USERS).find(x=>x.id===e.userId)?.name||'';
                     const cat=EXPENSE_CATEGORIES.find(x=>x.id===e.cat)?.name||'';
                     const t=Math.round(e.amount/this.state.rate);
                     c+=`${d},${u},${cat},${e.amount},${t},"${e.note||''}"\n`;
@@ -330,158 +448,66 @@
                 document.body.appendChild(l); l.click(); document.body.removeChild(l);
             },
 
-            // Cloud Wrappers
-            addCloudExpense: async function(d){if(window.db)await expensesRef.add({...d,timestamp:Date.now()});},
-            addCloudItinerary: async function(d,v){if(window.db)await itineraryRef.add({...v,dayIndex:d});},
-            deleteCloudItin: async function(id){if(confirm("刪除?"))await itineraryRef.doc(id).delete();},
-            addCloudBackup: async function(v){if(window.db)await backupRef.add({...v,timestamp:Date.now()});},
-            deleteCloudBackup: async function(id){if(confirm("刪除?"))await backupRef.doc(id).delete();},
-            
-            // Convert Helper
-            convertCurrency: function(t) {
-                const j=document.getElementById('conv-jpy'), tw=document.getElementById('conv-twd');
-                if(t==='jpy') tw.value=j.value?Math.round(j.value/this.state.rate):'';
-                else j.value=tw.value?Math.round(tw.value*this.state.rate):'';
+            // --- Cloud Operations (Modular SDK) ---
+            addCloudExpense: async function(d) {
+                if(!this.state.user) return;
+                try {
+                    await addDoc(getColl("expenses"), {...d, timestamp: Date.now()});
+                } catch(e) { console.error("Error adding expense:", e); alert("Error: " + e.message); }
             },
-
-            // 行程還原
+            deleteCloudExpense: async function(id) {
+                if(!confirm("刪除?")) return;
+                await deleteDoc(doc(getColl("expenses"), id));
+            },
+            
+            // Itinerary Ops
+            showAddItinModal: function(d) {
+                const t = prompt("時間 (如 10:00)"); if(!t)return;
+                const tt = prompt("標題"); if(!tt)return;
+                const n = prompt("備註");
+                addDoc(getColl("itinerary_events"), {time:t, title:tt, note:n||'', cost:'', mapUrl:tt, imgKey:'default', dayIndex:d});
+            },
+            deleteCloudItin: async function(id) {
+                if(confirm("刪除?")) await deleteDoc(doc(getColl("itinerary_events"), id));
+            },
             uploadDefaultItinerary: async function() {
                 if(!confirm("確定上傳預設行程?")) return;
-                const b=db.batch();
-                window.DEFAULT_ITINERARY_EVENTS_SOURCE.forEach(d=>{
+                const batch = writeBatch(db);
+                DEFAULT_ITINERARY_EVENTS_SOURCE.forEach(d=>{
                     d.events.forEach(e=>{
-                        const r=itineraryRef.doc();
-                        b.set(r,{...e, dayIndex:d.dayIndex, timestamp:Date.now()});
+                        const newRef = doc(getColl("itinerary_events"));
+                        batch.set(newRef, {...e, dayIndex:d.dayIndex, timestamp:Date.now()});
                     });
                 });
-                b.commit().then(()=>alert("完成!"));
+                await batch.commit();
+                alert("完成!");
+            },
+
+            // Backup Ops
+            submitBackup: function() {
+                const t = document.getElementById('bk-title').value;
+                const n = document.getElementById('bk-note').value;
+                if(t) { 
+                    addDoc(getColl("backup_events"), {title:t, tag:'自訂', note:n, timestamp:Date.now()});
+                    document.getElementById('bk-title').value = '';
+                    document.getElementById('bk-note').value = '';
+                }
+            },
+            addCloudBackup: async function(v) {
+                await addDoc(getColl("backup_events"), {...v, timestamp: Date.now()});
+            },
+            deleteCloudBackup: async function(id) {
+                if(confirm("刪除?")) await deleteDoc(doc(getColl("backup_events"), id));
             }
         };
 
-        // --- Data Constants ---
-        const EXPENSE_CATEGORIES=[{id:'food',name:'餐飲',icon:'utensils',color:'bg-orange-500'},{id:'transport',name:'交通',icon:'bus',color:'bg-blue-500'},{id:'shopping',name:'購物',icon:'shopping-bag',color:'bg-pink-500'},{id:'ticket',name:'門票',icon:'ticket',color:'bg-purple-500'},{id:'hotel',name:'住宿',icon:'home',color:'bg-indigo-500'},{id:'other',name:'其他',icon:'more-horizontal',color:'bg-gray-500'}];
-        const DAYS_STRUCTURE=[{date:"Day 1 (5/25)",title:"虎航早班機 & 美國村",icon:"plane"},{date:"Day 2 (5/26)",title:"藍洞浮潛 & 頂級燒肉",icon:"sun"},{date:"Day 3 (5/27)",title:"北部風光 & 居酒屋",icon:"map-pin"},{date:"Day 4 (5/28)",title:"購物日 & 唐吉訶德",icon:"shopping-bag"},{date:"Day 5 (5/29)",title:"南部悠閒 & 牛排宵夜",icon:"coffee"},{date:"Day 6 (5/30)",title:"Outlet & 機場免稅",icon:"plane"}];
-        const DEFAULT_USERS=[{id:'u1',name:'旅客 A',color:'bg-blue-500',text:'text-blue-400',border:'border-blue-500'},{id:'u2',name:'旅客 B',color:'bg-pink-500',text:'text-pink-400',border:'border-pink-500'},{id:'u3',name:'旅客 C',color:'bg-amber-500',text:'text-amber-400',border:'border-amber-500'},{id:'u4',name:'旅客 D',color:'bg-emerald-500',text:'text-emerald-400',border:'border-emerald-500'}];
+        // Attach to window
+        window.app = app;
         
-        // Renderers
-        function renderItinerary(c) {
-            if(app.state.itineraryEvents.length===0) {
-                c.innerHTML=`<div class="bg-slate-800 p-6 rounded-xl text-center border border-slate-700 mt-8"><i data-lucide="cloud-off" class="mx-auto text-slate-500 mb-2" width="48"></i><div class="text-white font-bold mb-2">行程是空的</div><button onclick="app.uploadDefaultItinerary()" class="bg-indigo-600 text-white px-4 py-2 rounded">上傳預設行程</button></div>`;
-                return;
-            }
-            DAYS_STRUCTURE.forEach((d,i)=>{
-                const evs = app.state.itineraryEvents.filter(e=>e.dayIndex===i).sort((a,b)=>a.time.localeCompare(b.time));
-                let h = evs.map(e=>`<div class="flex items-center gap-3 p-3 border-b border-slate-700/50 hover:bg-slate-700/30"><div class="w-12 text-right text-sm font-mono text-indigo-400 font-bold">${e.time}</div><div class="flex-1"><div class="text-sm font-bold text-slate-200">${e.title}</div><div class="text-xs text-slate-500">${e.note}</div></div><button onclick="app.deleteCloudItin('${e.id}')" class="text-slate-600 hover:text-red-400"><i data-lucide="trash-2" width="14"></i></button></div>`).join('');
-                const card = document.createElement('div');
-                card.className = "bg-[#1e293b] rounded-xl border border-slate-700/60 overflow-hidden mb-4";
-                card.innerHTML = `<div class="bg-slate-800 px-4 py-2 border-b border-slate-700 flex justify-between items-center"><span class="font-bold text-indigo-100">${d.date}</span><button onclick="showAddItinModal(${i})" class="text-indigo-400"><i data-lucide="plus-circle" width="18"></i></button></div><div>${h||'<div class="p-3 text-center text-xs text-slate-500">無行程</div>'}</div>`;
-                c.appendChild(card);
-            });
-        }
+        // Start
+        app.init();
 
-        function renderBackup(c) {
-            const lst = app.state.backupEvents.map(e=>`<div class="p-3 bg-slate-800 rounded mb-2 border border-slate-700 flex justify-between items-center"><div><div class="font-bold text-sm text-slate-200">${e.title}</div><div class="text-xs text-slate-500">${e.note}</div></div><button onclick="app.deleteCloudBackup('${e.id}')" class="text-slate-600 hover:text-red-400"><i data-lucide="trash-2" width="14"></i></button></div>`).join('');
-            c.innerHTML = `<div class="mb-4 flex gap-2"><input id="bk-title" placeholder="景點" class="bg-slate-800 border border-slate-600 rounded p-2 text-sm w-1/2"><input id="bk-note" placeholder="備註" class="bg-slate-800 border border-slate-600 rounded p-2 text-sm w-1/2"><button onclick="submitBackup()" class="bg-pink-600 text-white px-3 rounded"><i data-lucide="plus" width="16"></i></button></div><div>${lst||'<div class="text-center text-slate-500 text-sm">無備案</div>'}</div>`;
-        }
-
-        const REC_SPOTS=[{title:"美麗海水族館",tag:"北部"},{title:"古宇利島",tag:"北部"},{title:"美國村",tag:"中部"},{title:"萬座毛",tag:"中部"},{title:"國際通",tag:"南部"},{title:"瀨長島",tag:"南部"},{title:"暖暮拉麵",tag:"美食"},{title:"燒肉敘敘苑",tag:"美食"},{title:"Parco City",tag:"購物"},{title:"唐吉訶德",tag:"購物"}];
-        function renderRecommend(c) {
-            const h = REC_SPOTS.map(s=>`<div class="bg-slate-800 rounded p-3 border border-slate-700 flex justify-between items-center"><div><div class="font-bold text-sm text-slate-200">${s.title}</div><div class="text-xs text-blue-400 bg-blue-900/30 px-1.5 py-0.5 rounded inline-block mt-1">${s.tag}</div></div><button onclick="app.addCloudBackup({title:'${s.title}',tag:'${s.tag}',note:'推薦',timestamp:Date.now()});alert('已加入')" class="bg-slate-700 hover:bg-blue-600 text-white p-1.5 rounded"><i data-lucide="plus" width="14"></i></button></div>`).join('');
-            c.innerHTML = `<div class="grid grid-cols-2 gap-3">${h}</div>`;
-        }
-
-        function renderSplit(c) {
-            const u = app.state.users;
-            const isTwd = app.state.splitCurrency === 'TWD';
-            
-            c.innerHTML = `
-                <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
-                    <div class="flex gap-2 mb-4">
-                        <input type="number" id="split-input" value="${app.state.splitAmount}" oninput="app.updateSplitCalc(this.value)" class="w-2/3 bg-slate-900 border border-slate-600 rounded p-3 text-xl text-center text-white outline-none focus:border-amber-500" placeholder="總金額">
-                        <div class="w-1/3 flex bg-slate-900 rounded border border-slate-600 p-1">
-                            <button onclick="app.setSplitCurrency('JPY')" class="flex-1 rounded text-xs ${!isTwd?'bg-amber-600 text-white':'text-slate-400'}">日幣</button>
-                            <button onclick="app.setSplitCurrency('TWD')" class="flex-1 rounded text-xs ${isTwd?'bg-indigo-600 text-white':'text-slate-400'}">台幣</button>
-                        </div>
-                    </div>
-                    <div class="space-y-3">
-                        <div>
-                            <div class="text-xs text-slate-400 mb-1">付款人</div>
-                            <div class="flex gap-2 overflow-x-auto pb-1">${u.map(x=>`<button onclick="app.setSplitPayer('${x.id}')" class="px-3 py-2 rounded text-xs whitespace-nowrap transition-colors ${app.state.splitPayer===x.id?`${x.color} text-white`:'bg-slate-700 text-slate-400'}">${x.name}</button>`).join('')}</div>
-                        </div>
-                        <div>
-                            <div class="text-xs text-slate-400 mb-1">分攤對象</div>
-                            <div class="grid grid-cols-2 gap-2">${u.map(x=>{const sel=app.state.splitTargets.includes(x.id); return `<button onclick="app.toggleSplitTarget('${x.id}')" class="py-2 rounded text-xs border ${sel?'bg-slate-600 text-white border-amber-500':'bg-slate-700 text-slate-500 border-transparent'}">${x.name} ${sel?'✓':''}</button>`}).join('')}</div>
-                        </div>
-                    </div>
-                    <div id="split-result" class="mt-4"></div>
-                </div>
-            `;
-            // Trigger calc
-            app.updateSplitCalc(app.state.splitAmount);
-        }
-
-        function renderAccounting(c) {
-            // Summary
-            const total = app.state.expenses.reduce((s,i)=>s+i.amount,0);
-            const twd = Math.round(total/app.state.rate);
-            
-            const usersHtml = app.state.users.map(u=>`<div class="flex flex-col items-center"><div class="w-8 h-8 rounded-full ${u.color} flex items-center justify-center text-white font-bold text-xs shadow">${u.name[0]}</div><div class="text-[10px] mt-1 text-slate-400">${u.name}</div></div>`).join('');
-            
-            const isJpy = app.tempExpCurr==='JPY';
-            const cats = EXPENSE_CATEGORIES.map(x=>`<button onclick="app.setExpCat('${x.id}')" class="flex flex-col items-center gap-1 p-2 rounded ${app.tempExpCat===x.id?'bg-slate-700 ring-1 ring-emerald-500':''}"><div class="${x.color} text-white p-1.5 rounded-full"><i data-lucide="${x.icon}" width="14"></i></div><span class="text-[10px] text-slate-400">${x.name}</span></button>`).join('');
-
-            // List
-            const list = app.state.expenses.map(e=>{
-                const u = app.state.users.find(x=>x.id===e.userId)||DEFAULT_USERS[0];
-                const cat = EXPENSE_CATEGORIES.find(x=>x.id===e.cat)||EXPENSE_CATEGORIES[0];
-                const isEx = app.state.expandedExpId === e.id;
-                return `<div onclick="app.toggleExpandExpense('${e.id}')" class="bg-slate-800 border-l-4 ${u.border} rounded mb-2 overflow-hidden"><div class="p-3 flex items-center gap-3"><div class="${cat.color} p-2 rounded-full text-white"><i data-lucide="${cat.icon}" width="16"></i></div><div class="flex-1"><div class="flex justify-between"><span class="text-sm font-bold text-slate-200">${e.note||cat.name}</span><span class="font-mono text-white">¥${e.amount}</span></div><div class="text-[10px] text-slate-500 flex justify-between mt-1"><span>${u.name}</span><span>≈ NT$${Math.round(e.amount/app.state.rate)}</span></div></div></div>${isEx?`<div class="bg-slate-900/30 p-2 text-right"><button onclick="event.stopPropagation();app.deleteCloudExpense('${e.id}')" class="text-xs text-red-400 flex items-center justify-end gap-1"><i data-lucide="trash-2" width="12"></i> 刪除</button></div>`:''}</div>`;
-            }).join('');
-
-            c.innerHTML = `
-                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 mb-4"><div class="text-center"><div class="text-3xl font-bold text-white">¥${total.toLocaleString()}</div><div class="text-xs text-slate-400">約 NT$ ${twd.toLocaleString()}</div></div><div class="grid grid-cols-4 gap-2 mt-4 border-t border-slate-700 pt-3">${usersHtml}</div></div>
-                
-                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 mb-4">
-                    <div class="flex gap-2 mb-3">
-                        <div class="w-2/3 relative"><input type="number" id="amt-in" value="${app.state.formAmount}" oninput="app.syncAmount(this.value)" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white text-lg outline-none focus:border-emerald-500" placeholder="0"><span class="absolute right-2 top-3 text-xs text-slate-500">${app.tempExpCurr}</span></div>
-                        <div class="w-1/3 flex bg-slate-900 rounded border border-slate-600 p-1"><button onclick="app.setExpCurr('JPY')" class="flex-1 text-xs rounded ${isJpy?'bg-emerald-600 text-white':'text-slate-400'}">日</button><button onclick="app.setExpCurr('TWD')" class="flex-1 text-xs rounded ${!isJpy?'bg-indigo-600 text-white':'text-slate-400'}">台</button></div>
-                    </div>
-                    <div class="grid grid-cols-6 gap-1 mb-3">${cats}</div>
-                    <div class="flex gap-2"><input id="note-in" value="${app.state.formNote}" oninput="app.syncNote(this.value)" placeholder="備註" class="flex-1 bg-slate-900 border border-slate-600 rounded px-3 text-sm text-white outline-none"><button onclick="app.submitExpense()" class="bg-emerald-600 text-white p-2.5 rounded shadow"><i data-lucide="plus" width="20"></i></button></div>
-                </div>
-                
-                <div>${list}</div>
-            `;
-        }
-
-        // Modal Wrappers for Itinerary Adding
-        window.showAddItinModal = (d) => {
-            const t = prompt("時間 (如 10:00)"); if(!t)return;
-            const tt = prompt("標題"); if(!tt)return;
-            const n = prompt("備註");
-            app.addCloudItinerary(d, {time:t, title:tt, note:n||'', cost:'', mapUrl:tt, imgKey:'default'});
-        };
-        
-        // Backup Handlers
-        window.submitBackup = () => {
-            const t = document.getElementById('bk-title').value;
-            const n = document.getElementById('bk-note').value;
-            if(t) { app.addCloudBackup({title:t, tag:'自訂', note:n, timestamp:Date.now()}); }
-        };
-
-        // Data Sources (Full Restore)
-        window.DEFAULT_ITINERARY_EVENTS_SOURCE = [
-            {dayIndex:0, events:[{time:"09:20",title:"抵達那霸機場 & 取車",note:"預計出關+取車約1.5小時",cost:"租車費",imgKey:"airport"},{time:"11:30",title:"糸滿魚市場",note:"海鮮生魚片",cost:"¥2000",imgKey:"market"},{time:"15:30",title:"Snoopy Surf Shop",note:"美國村",cost:"",imgKey:"american-village"},{time:"20:00",title:"美國村夜景",note:"日落步道",cost:"",imgKey:"night-view"}]},
-            {dayIndex:1, events:[{time:"08:00",title:"青之洞窟浮潛",note:"真榮田岬",cost:"¥4000",imgKey:"snorkeling"},{time:"11:30",title:"Pizzeria da ENZO",note:"窯烤披薩",cost:"¥2000",imgKey:"pizza"},{time:"19:00",title:"琉球之牛",note:"頂級燒肉",cost:"¥8000",imgKey:"beef"}]},
-            {dayIndex:2, events:[{time:"11:00",title:"古宇利大橋",note:"心形岩",cost:"",imgKey:"bridge"},{time:"14:00",title:"美麗海水族館",note:"黑潮之海",cost:"¥2180",imgKey:"aquarium"},{time:"19:00",title:"阿古豬涮涮鍋",note:"恩納豚",cost:"¥4000",imgKey:"food-taco"}]},
-            {dayIndex:3, events:[{time:"11:00",title:"PARCO CITY",note:"最大百貨",cost:"",imgKey:"parco"},{time:"20:30",title:"唐吉訶德",note:"國際通24H",cost:"",imgKey:"donki"}]},
-            {dayIndex:4, events:[{time:"09:30",title:"波上宮",note:"海邊神社",cost:"¥800",imgKey:"shrine"},{time:"14:00",title:"壺屋通",note:"文青下午茶",cost:"¥1000",imgKey:"coffee"},{time:"22:00",title:"傑克牛排",note:"美式復古",cost:"¥2500",imgKey:"beef"}]},
-            {dayIndex:5, events:[{time:"11:00",title:"Ashibinaa Outlet",note:"最後購物",cost:"",imgKey:"outlet"},{time:"15:00",title:"iias 豐崎",note:"DMM水族館",cost:"",imgKey:"parco"},{time:"19:40",title:"那霸機場",note:"返台",cost:"",imgKey:"airport"}]}
-        ];
-
-        window.onload();
     </script>
 </body>
 </html>
-
 
